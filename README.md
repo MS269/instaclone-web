@@ -2,7 +2,9 @@
 
 Instaclone Web - React
 
+## Setup
+
 - [x] Router
 - [x] Authentication
 - [x] Arch.
-- [ ] Styles
+- [x] Styles
