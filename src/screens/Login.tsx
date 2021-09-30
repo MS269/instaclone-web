@@ -1,34 +1,48 @@
-import { useState } from "react";
+import {
+  faFacebookSquare,
+  faInstagram,
+} from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
-import { darkModeVar, isLoggedInVar } from "../apollo";
+import AuthLayout from "../components/auth/AuthLayout";
+import BottomBox from "../components/auth/BottomBox";
+import Button from "../components/auth/Button";
+import FormBox from "../components/auth/FormBox";
+import Input from "../components/auth/Input";
+import Separator from "../components/auth/Separator";
+import routes from "../routes";
 
-function Login() {
-  const [big, setBig] = useState(false);
-
-  const toggleBig = (big: boolean) => setBig(!big);
-
-  return (
-    <Container>
-      <Title big={big}>Login</Title>
-      <button onClick={() => isLoggedInVar(true)}>Login Now!</button>
-      <button onClick={() => darkModeVar(true)}>To dark</button>
-      <button onClick={() => darkModeVar(false)}>To light</button>
-      <button onClick={() => toggleBig(big)}>
-        {big ? "Smaller" : "Bigger"}
-      </button>
-    </Container>
-  );
-}
-
-interface IContainerProps {
-  big: boolean;
-}
-
-const Title = styled.h1<IContainerProps>`
-  color: ${(props) => props.theme.fontColor};
-  font-size: ${(props) => (props.big ? "32px" : "16px")};
+const FacebookLogin = styled.div`
+  color: #385285;
+  span {
+    margin-left: 10px;
+    font-weight: 600;
+  }
 `;
 
-const Container = styled.div``;
+function Login() {
+  return (
+    <AuthLayout>
+      <FormBox>
+        <FontAwesomeIcon icon={faInstagram} size="3x" />
+        <form>
+          <Input type="text" placeholder="Username" />
+          <Input type="password" placeholder="Password" />
+          <Button type="submit" value="Log in" />
+        </form>
+        <Separator />
+        <FacebookLogin>
+          <FontAwesomeIcon icon={faFacebookSquare} />
+          <span>Log in with Facebook</span>
+        </FacebookLogin>
+      </FormBox>
+      <BottomBox
+        cta="Don't have an account?"
+        linkText="Sign up"
+        link={routes.signUp}
+      />
+    </AuthLayout>
+  );
+}
 
 export default Login;
