@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const SInput = styled.input`
+const Input = styled.input`
   background-color: #fafafa;
   width: 100%;
   margin-top: 5px;
@@ -12,9 +12,5 @@ const SInput = styled.input`
     font-size: 12px;
   }
 `;
-
-function Input(props: any) {
-  return <SInput {...props} />;
-}
 
 export default Input;

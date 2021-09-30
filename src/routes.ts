@@ -3,6 +3,7 @@ interface IRoutes {
 }
 
 const routes: IRoutes = {
+  home: "/",
   signUp: "/signup",
 };
 
