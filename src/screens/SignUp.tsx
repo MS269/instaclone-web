@@ -7,7 +7,7 @@ import Button from "../components/auth/Button";
 import FormBox from "../components/auth/FormBox";
 import Input from "../components/auth/Input";
 import PageTitle from "../components/PageTitle";
-import { FatLink } from "../components/shared";
+import { FatLink } from "../components/sharedStyles";
 import routes from "../routes";
 
 const HeaderContainer = styled.div`

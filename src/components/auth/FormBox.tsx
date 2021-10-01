@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { BaseBox } from "../shared";
+import { BaseBox } from "../sharedStyles";
 
 interface IProps {
   children: React.ReactNode;
