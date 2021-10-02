@@ -1,10 +1,14 @@
-import { isLoggedInVar } from "../apollo";
+import { useHistory } from "react-router";
+import { logUserOut } from "../apollo";
+import { IState } from "../types";
 
 function Home() {
+  const history = useHistory<IState>();
+
   return (
     <div>
-      <h1>Logout</h1>
-      <button onClick={() => isLoggedInVar(false)}>Logout Now!</button>
+      <h1>Welcome!</h1>
+      <button onClick={() => logUserOut(history)}>Log out Now!</button>
     </div>
   );
 }

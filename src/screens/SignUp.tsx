@@ -1,14 +1,57 @@
+import { useMutation } from "@apollo/client";
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import gql from "graphql-tag";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useHistory } from "react-router";
 import styled from "styled-components";
 import AuthLayout from "../components/auth/AuthLayout";
 import BottomBox from "../components/auth/BottomBox";
 import Button from "../components/auth/Button";
 import FormBox from "../components/auth/FormBox";
+import FormError from "../components/auth/FormError";
 import Input from "../components/auth/Input";
 import PageTitle from "../components/PageTitle";
 import { FatLink } from "../components/sharedStyles";
 import routes from "../routes";
+import { IState } from "../types";
+
+interface ISignUpFormInput {
+  email: string;
+  firstName: string;
+  lastName?: string;
+  username: string;
+  password: string;
+  response?: null;
+}
+
+interface ISignUpFormResponse {
+  createAccount: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+const CREATE_ACCOUNT_MUTATION = gql`
+  mutation CreateAccountMutation(
+    $email: String!
+    $firstName: String!
+    $lastName: String
+    $username: String!
+    $password: String!
+  ) {
+    createAccount(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      username: $username
+      password: $password
+    ) {
+      ok
+      error
+    }
+  }
+`;
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -23,6 +66,42 @@ const Subtitle = styled(FatLink)`
 `;
 
 function SignUp() {
+  const history = useHistory<IState>();
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    clearErrors,
+    getValues,
+    formState,
+  } = useForm<ISignUpFormInput>({
+    mode: "onChange",
+  });
+
+  const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT_MUTATION, {
+    onCompleted: ({ createAccount: { ok, error } }: ISignUpFormResponse) => {
+      const { username, password } = getValues();
+      if (!ok) {
+        return setError("response", { message: error });
+      }
+      history.push(routes.home, {
+        message: "Account created. Please log in.",
+        username,
+        password,
+      });
+    },
+  });
+
+  const onSubmitValid: SubmitHandler<ISignUpFormInput> = (data) => {
+    if (loading) {
+      return;
+    }
+    createAccount({ variables: { ...data } });
+  };
+
+  const clearLoginError = () => clearErrors("response");
+
   return (
     <AuthLayout>
       <PageTitle title="Sign up" />
@@ -33,12 +112,59 @@ function SignUp() {
             Sign up to see photos and videos from your friends.
           </Subtitle>
         </HeaderContainer>
-        <form>
-          <Input type="text" placeholder="Name" />
-          <Input type="text" placeholder="Email" />
-          <Input type="text" placeholder="Username" />
-          <Input type="password" placeholder="Password" />
-          <Button type="submit" value="Sign up" />
+        <form onSubmit={handleSubmit(onSubmitValid)}>
+          <Input
+            type="text"
+            placeholder="Email"
+            hasError={Boolean(formState?.errors?.email)}
+            {...register("email", { required: "Email is required." })}
+          />
+          <FormError message={formState?.errors?.email?.message} />
+          <Input
+            type="text"
+            placeholder="First Name"
+            hasError={Boolean(formState?.errors?.firstName)}
+            {...register("firstName", { required: "First Name is required." })}
+          />
+          <FormError message={formState?.errors?.firstName?.message} />
+          <Input
+            type="text"
+            placeholder="Last Name"
+            {...register("lastName")}
+          />
+          <Input
+            type="text"
+            placeholder="Username"
+            hasError={Boolean(formState?.errors?.username)}
+            {...register("username", {
+              required: "Username is required.",
+              minLength: {
+                value: 5,
+                message: "Username should be longer than 5 characters.",
+              },
+              onChange: clearLoginError,
+            })}
+          />
+          <FormError message={formState?.errors?.username?.message} />
+          <Input
+            type="password"
+            placeholder="Password"
+            hasError={Boolean(formState?.errors?.password)}
+            {...register("password", {
+              required: "Password is required.",
+              minLength: {
+                value: 5,
+                message: "Password should be longer than 5 characters.",
+              },
+              onChange: clearLoginError,
+            })}
+          />
+          <FormError message={formState?.errors?.password?.message} />
+          <Button
+            type="submit"
+            value={loading ? "Loading..." : "Sign up"}
+            disabled={!formState.isValid || loading}
+          />
         </form>
       </FormBox>
       <BottomBox cta="Have an account?" linkText="Log in" link={routes.home} />
