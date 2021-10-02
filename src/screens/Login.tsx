@@ -5,6 +5,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import gql from "graphql-tag";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useLocation } from "react-router";
 import styled from "styled-components";
@@ -20,20 +21,10 @@ import Separator from "../components/auth/Separator";
 import PageTitle from "../components/PageTitle";
 import routes from "../routes";
 import { IState } from "../types";
-
-interface ILoginFormInput {
-  username: string;
-  password: string;
-  response?: null;
-}
-
-interface ILoginFormResponse {
-  login: {
-    ok: boolean;
-    token?: string;
-    error?: string;
-  };
-}
+import {
+  LoginMutation,
+  LoginMutationVariables,
+} from "../__generated__/LoginMutation";
 
 const LOGIN_MUTATION = gql`
   mutation LoginMutation($username: String!, $password: String!) {
@@ -55,36 +46,38 @@ const FacebookLogin = styled.div`
 
 function Login() {
   const location = useLocation<IState>();
+  const [loginError, setLoginError] = useState("");
 
-  const { register, handleSubmit, setError, clearErrors, formState } =
-    useForm<ILoginFormInput>({
+  const { register, handleSubmit, formState } = useForm<LoginMutationVariables>(
+    {
       mode: "onChange",
       defaultValues: {
         username: location?.state?.username || "",
         password: location?.state?.password || "",
       },
-    });
+    }
+  );
 
   const [login, { loading }] = useMutation(LOGIN_MUTATION, {
-    onCompleted: ({ login: { ok, error, token } }: ILoginFormResponse) => {
+    onCompleted: ({ login: { ok, error, token } }: LoginMutation) => {
       if (!ok) {
-        return setError("response", { message: error });
+        return setLoginError(error || "");
       }
       if (!token) {
-        return setError("response", { message: "Token not received." });
+        return setLoginError("Token not received.");
       }
       logUserIn(token);
     },
   });
 
-  const onSubmitValid: SubmitHandler<ILoginFormInput> = (data) => {
+  const onSubmitValid: SubmitHandler<LoginMutationVariables> = (data) => {
     if (loading) {
       return;
     }
     login({ variables: { ...data } });
   };
 
-  const clearLoginError = () => clearErrors("response");
+  const clearLoginError = () => setLoginError("");
 
   return (
     <AuthLayout>
@@ -126,7 +119,7 @@ function Login() {
             value={loading ? "Loading..." : "Log in"}
             disabled={!formState.isValid || loading}
           />
-          <FormError message={formState?.errors?.response?.message} />
+          <FormError message={loginError} />
         </form>
         <Separator />
         <FacebookLogin>

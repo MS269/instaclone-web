@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/client";
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import gql from "graphql-tag";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useHistory } from "react-router";
 import styled from "styled-components";
@@ -15,22 +16,10 @@ import PageTitle from "../components/PageTitle";
 import { FatLink } from "../components/sharedStyles";
 import routes from "../routes";
 import { IState } from "../types";
-
-interface ISignUpFormInput {
-  email: string;
-  firstName: string;
-  lastName?: string;
-  username: string;
-  password: string;
-  response?: null;
-}
-
-interface ISignUpFormResponse {
-  createAccount: {
-    ok: boolean;
-    error?: string;
-  };
-}
+import {
+  CreateAccountMutation,
+  CreateAccountMutationVariables,
+} from "../__generated__/CreateAccountMutation";
 
 const CREATE_ACCOUNT_MUTATION = gql`
   mutation CreateAccountMutation(
@@ -67,23 +56,18 @@ const Subtitle = styled(FatLink)`
 
 function SignUp() {
   const history = useHistory<IState>();
+  const [signUpError, setSignUpError] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    clearErrors,
-    getValues,
-    formState,
-  } = useForm<ISignUpFormInput>({
-    mode: "onChange",
-  });
+  const { register, handleSubmit, getValues, formState } =
+    useForm<CreateAccountMutationVariables>({
+      mode: "onChange",
+    });
 
   const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT_MUTATION, {
-    onCompleted: ({ createAccount: { ok, error } }: ISignUpFormResponse) => {
+    onCompleted: ({ createAccount: { ok, error } }: CreateAccountMutation) => {
       const { username, password } = getValues();
       if (!ok) {
-        return setError("response", { message: error });
+        return setSignUpError(error || "");
       }
       history.push(routes.home, {
         message: "Account created. Please log in.",
@@ -93,14 +77,16 @@ function SignUp() {
     },
   });
 
-  const onSubmitValid: SubmitHandler<ISignUpFormInput> = (data) => {
+  const onSubmitValid: SubmitHandler<CreateAccountMutationVariables> = (
+    data
+  ) => {
     if (loading) {
       return;
     }
     createAccount({ variables: { ...data } });
   };
 
-  const clearLoginError = () => clearErrors("response");
+  const clearLoginError = () => setSignUpError("");
 
   return (
     <AuthLayout>
@@ -165,6 +151,7 @@ function SignUp() {
             value={loading ? "Loading..." : "Sign up"}
             disabled={!formState.isValid || loading}
           />
+          <FormError message={signUpError} />
         </form>
       </FormBox>
       <BottomBox cta="Have an account?" linkText="Log in" link={routes.home} />
