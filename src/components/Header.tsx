@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { isLoggedInVar } from "../apollo";
 import routes from "../routes";
+import Avatar from "./Avatar";
 import useUser from "./hooks/useUser";
 
 const SHeader = styled.header`
@@ -29,6 +30,11 @@ const Wrapper = styled.div`
 
 const Column = styled.div``;
 
+const IconsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const Icon = styled.span`
   margin-left: 15px;
 `;
@@ -43,8 +49,7 @@ const Button = styled.span`
 
 function Header() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
-
-  useUser();
+  const { data } = useUser();
 
   return (
     <SHeader>
@@ -54,7 +59,7 @@ function Header() {
         </Column>
         <Column>
           {isLoggedIn ? (
-            <>
+            <IconsContainer>
               <Icon>
                 <FontAwesomeIcon icon={faHome} size="lg" />
               </Icon>
@@ -62,9 +67,13 @@ function Header() {
                 <FontAwesomeIcon icon={faCompass} size="lg" />
               </Icon>
               <Icon>
-                <FontAwesomeIcon icon={faUser} size="lg" />
+                {data?.me?.avatar ? (
+                  <Avatar url={data?.me?.avatar || ""} />
+                ) : (
+                  <FontAwesomeIcon icon={faUser} size="lg" />
+                )}
               </Icon>
-            </>
+            </IconsContainer>
           ) : (
             <Link to={routes.home}>
               <Button>Login</Button>
