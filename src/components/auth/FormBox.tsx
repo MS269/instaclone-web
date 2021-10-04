@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { BaseBox } from "../sharedStyles";
 
-interface IProps {
+interface IFormBoxProps {
   children: React.ReactNode;
 }
 
@@ -22,7 +22,7 @@ const Container = styled(BaseBox)`
   }
 `;
 
-function FormBox({ children }: IProps) {
+function FormBox({ children }: IFormBoxProps) {
   return <Container>{children}</Container>;
 }
 

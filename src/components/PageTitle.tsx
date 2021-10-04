@@ -1,10 +1,10 @@
 import { Helmet } from "react-helmet-async";
 
-interface IProps {
+interface IPageTitleProps {
   title: string;
 }
 
-function PageTitle({ title }: IProps) {
+function PageTitle({ title }: IPageTitleProps) {
   return (
     <Helmet>
       <title>{title} | Instaclone</title>

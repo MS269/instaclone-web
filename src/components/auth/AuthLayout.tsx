@@ -5,7 +5,7 @@ import React from "react";
 import styled from "styled-components";
 import { darkModeVar, disableDarkMode, enableDarkMode } from "../../apollo";
 
-interface IProps {
+interface IAuthLayoutProps {
   children: React.ReactNode;
 }
 
@@ -30,7 +30,7 @@ const DarkModeBtn = styled.span`
   cursor: pointer;
 `;
 
-function AuthLayout({ children }: IProps) {
+function AuthLayout({ children }: IAuthLayoutProps) {
   const darkMode = useReactiveVar(darkModeVar);
 
   return (
