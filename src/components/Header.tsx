@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { isLoggedInVar } from "../apollo";
+import useUser from "../hooks/useUser";
 import routes from "../routes";
 import Avatar from "./Avatar";
-import useUser from "./hooks/useUser";
 
 const SHeader = styled.header`
   display: flex;
@@ -68,7 +68,7 @@ function Header() {
               </Icon>
               <Icon>
                 {data?.me?.avatar ? (
-                  <Avatar url={data?.me?.avatar || ""} />
+                  <Avatar url={data?.me?.avatar} />
                 ) : (
                   <FontAwesomeIcon icon={faUser} size="lg" />
                 )}

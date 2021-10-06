@@ -1,14 +1,44 @@
-import { useHistory } from "react-router";
-import { logUserOut } from "../apollo";
-import { IState } from "../types";
+import { useQuery } from "@apollo/client";
+import gql from "graphql-tag";
+import Photo from "../components/feed/Photo";
+import PageTitle from "../components/PageTitle";
+import { SeeFeedQuery_seeFeed } from "../__generated__/SeeFeedQuery";
+
+const FEED_QUERY = gql`
+  query SeeFeedQuery {
+    seeFeed {
+      id
+      user {
+        username
+        avatar
+      }
+      file
+      caption
+      likes
+      comments
+      createdAt
+      isMine
+      isLiked
+    }
+  }
+`;
 
 function Home() {
-  const history = useHistory<IState>();
+  const { data } = useQuery(FEED_QUERY);
 
   return (
     <div>
-      <h1>Welcome!</h1>
-      <button onClick={() => logUserOut(history)}>Log out Now!</button>
+      <PageTitle title="Home" />
+      {data?.seeFeed?.map((photo: SeeFeedQuery_seeFeed) => (
+        <Photo
+          key={photo.id}
+          id={photo.id}
+          user={photo.user}
+          file={photo.file}
+          likes={photo.likes}
+          isLiked={photo.isLiked}
+        />
+      ))}
     </div>
   );
 }
