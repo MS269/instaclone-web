@@ -10,9 +10,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { PhotoFragment } from "../../__generated__/PhotoFragment";
-import { SeeFeedQuery_seeFeed_user } from "../../__generated__/SeeFeedQuery";
+import {
+  SeeFeedQuery_seeFeed_comments,
+  SeeFeedQuery_seeFeed_user,
+} from "../../__generated__/SeeFeedQuery";
 import Avatar from "../Avatar";
 import { FatText } from "../sharedStyles";
+import Comments from "./Comments";
 
 const TOGGLE_LIKE_MUTATION = gql`
   mutation ToggleLikeMutation($id: Int!) {
@@ -27,7 +31,10 @@ interface IPhotoProps {
   id: number;
   user: SeeFeedQuery_seeFeed_user;
   file: string;
+  caption: string | null;
   likes: number;
+  comments: (SeeFeedQuery_seeFeed_comments | null)[] | null;
+  commentNumber: number;
   isLiked: boolean;
 }
 
@@ -81,7 +88,16 @@ const Likes = styled(FatText)`
   margin-top: 15px;
 `;
 
-function Photo({ id, user, file, likes, isLiked }: IPhotoProps) {
+function Photo({
+  id,
+  user,
+  file,
+  caption,
+  likes,
+  comments,
+  commentNumber,
+  isLiked,
+}: IPhotoProps) {
   const updateToggleLike = (cache: ApolloCache<any>, result: any) => {
     const {
       data: {
@@ -151,6 +167,12 @@ function Photo({ id, user, file, likes, isLiked }: IPhotoProps) {
           </div>
         </PhotoActions>
         <Likes>{likes === 1 ? " 1 like" : `${likes} likes`}</Likes>
+        <Comments
+          author={user.username}
+          caption={caption}
+          commentNumber={commentNumber}
+          comments={comments}
+        />
       </PhotoData>
     </PhotoContainer>
   );
