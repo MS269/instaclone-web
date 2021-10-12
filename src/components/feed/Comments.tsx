@@ -37,7 +37,7 @@ function Comments({
         <Comment
           key={comment?.id}
           author={comment?.user?.username || ""}
-          payload={caption || ""}
+          payload={comment?.payload || ""}
         />
       ))}
     </CommentsContainer>
