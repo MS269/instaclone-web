@@ -9,7 +9,6 @@ import { faHeart as SolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import gql from "graphql-tag";
 import styled from "styled-components";
-import { PhotoFragment } from "../../__generated__/PhotoFragment";
 import {
   SeeFeedQuery_seeFeed_comments,
   SeeFeedQuery_seeFeed_user,
@@ -105,32 +104,18 @@ function Photo({
       },
     } = result;
     if (ok) {
-      const fragmentId = `Photo:${id}`;
-      const fragment = gql`
-        fragment PhotoFragment on Photo {
-          isLiked
-          likes
-        }
-      `;
-      const fragmentResult = cache.readFragment<PhotoFragment, any>({
-        id: fragmentId,
-        fragment,
-      });
-      if (
-        fragmentResult &&
-        "isLiked" in fragmentResult &&
-        "likes" in fragmentResult
-      ) {
-        const { isLiked: cacheIsLiked, likes: cacheLikes } = fragmentResult;
-        cache.writeFragment({
-          id: fragmentId,
-          fragment,
-          data: {
-            isLiked: !cacheIsLiked,
-            likes: cacheIsLiked ? cacheLikes - 1 : cacheLikes + 1,
+      const photoId = `Photo:${id}`;
+      cache.modify({
+        id: photoId,
+        fields: {
+          isLiked(prev) {
+            return !prev;
           },
-        });
-      }
+          likes(prev) {
+            return prev + (isLiked ? -1 : 1);
+          },
+        },
+      });
     }
   };
 
