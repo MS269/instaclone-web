@@ -1,4 +1,4 @@
-import sanitizeHtml from "sanitize-html";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { FatText } from "../sharedStyles";
 
@@ -11,7 +11,7 @@ const CommentContainer = styled.div``;
 
 const CommentCaption = styled.span`
   margin-left: 10px;
-  mark {
+  a {
     background-color: inherit;
     color: ${(props) => props.theme.accent};
     cursor: pointer;
@@ -22,15 +22,20 @@ const CommentCaption = styled.span`
 `;
 
 function Comment({ author, payload }: ICommentProps) {
-  const cleanedPayload = sanitizeHtml(
-    payload.replace(/#[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\w]+/g, "<mark>$&</mark>"),
-    { allowedTags: ["mark"] }
-  );
-
   return (
     <CommentContainer>
       <FatText>{author}</FatText>
-      <CommentCaption dangerouslySetInnerHTML={{ __html: cleanedPayload }} />
+      <CommentCaption>
+        {payload.split(" ").map((word, index) =>
+          /#[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\w]+/g.test(word) ? (
+            <Link key={index} to={`/hashtags/${word}`}>
+              {word}&nbsp;
+            </Link>
+          ) : (
+            <span key={index}>{word}&nbsp;</span>
+          )
+        )}
+      </CommentCaption>
     </CommentContainer>
   );
 }
