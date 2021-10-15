@@ -48,16 +48,6 @@ function Login() {
   const location = useLocation<IState>();
   const [loginError, setLoginError] = useState("");
 
-  const { register, handleSubmit, formState } = useForm<LoginMutationVariables>(
-    {
-      mode: "onChange",
-      defaultValues: {
-        username: location?.state?.username || "",
-        password: location?.state?.password || "",
-      },
-    }
-  );
-
   const [login, { loading }] = useMutation(LOGIN_MUTATION, {
     onCompleted: ({ login: { ok, error, token } }: LoginMutation) => {
       if (!ok) {
@@ -69,6 +59,16 @@ function Login() {
       logUserIn(token);
     },
   });
+
+  const { register, handleSubmit, formState } = useForm<LoginMutationVariables>(
+    {
+      mode: "onChange",
+      defaultValues: {
+        username: location?.state?.username || "",
+        password: location?.state?.password || "",
+      },
+    }
+  );
 
   const onSubmitValid: SubmitHandler<LoginMutationVariables> = (data) => {
     if (loading) {

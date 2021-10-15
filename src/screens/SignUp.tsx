@@ -58,11 +58,6 @@ function SignUp() {
   const history = useHistory<IState>();
   const [signUpError, setSignUpError] = useState("");
 
-  const { register, handleSubmit, getValues, formState } =
-    useForm<CreateAccountMutationVariables>({
-      mode: "onChange",
-    });
-
   const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT_MUTATION, {
     onCompleted: ({ createAccount: { ok, error } }: CreateAccountMutation) => {
       const { username, password } = getValues();
@@ -76,6 +71,11 @@ function SignUp() {
       });
     },
   });
+
+  const { register, handleSubmit, getValues, formState } =
+    useForm<CreateAccountMutationVariables>({
+      mode: "onChange",
+    });
 
   const onSubmitValid: SubmitHandler<CreateAccountMutationVariables> = (
     data
