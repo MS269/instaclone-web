@@ -1,10 +1,25 @@
+import { ApolloCache, useMutation } from "@apollo/client";
+import gql from "graphql-tag";
+import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { DeleteCommentMutationVariables } from "../../__generated__/DeleteCommentMutation";
 import { FatText } from "../sharedStyles";
 
+const DELETE_COMMENT_MUTATION = gql`
+  mutation DeleteCommentMutation($id: Int!) {
+    deleteComment(id: $id) {
+      ok
+    }
+  }
+`;
+
 interface ICommentProps {
+  id?: number;
+  photoId?: number;
   author: string;
   payload: string;
+  isMine?: boolean;
 }
 
 const CommentContainer = styled.div`
@@ -23,21 +38,54 @@ const CommentCaption = styled.span`
   }
 `;
 
-function Comment({ author, payload }: ICommentProps) {
+const DeleteButton = styled.span`
+  cursor: pointer;
+`;
+
+function Comment({ id, photoId, author, payload, isMine }: ICommentProps) {
+  const updateDeleteComment = (cache: ApolloCache<any>, result: any) => {
+    const {
+      data: {
+        deleteComment: { ok },
+      },
+    } = result;
+    if (ok) {
+      cache.evict({ id: `Comment:${id}` });
+      cache.modify({
+        id: `Photo:${photoId}`,
+        fields: {
+          commmentsNumber(prev) {
+            return prev - 1;
+          },
+        },
+      });
+    }
+  };
+
+  const [deleteCommentMutation] = useMutation<DeleteCommentMutationVariables>(
+    DELETE_COMMENT_MUTATION,
+    { variables: { id }, update: updateDeleteComment }
+  );
+
+  const onDeleteClick = () => deleteCommentMutation();
+
   return (
     <CommentContainer>
       <FatText>{author}</FatText>
       <CommentCaption>
         {payload.split(" ").map((word, index) =>
           /#[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\w]+/g.test(word) ? (
-            <Link key={index} to={`/hashtags/${word}`}>
-              {word}&nbsp;
-            </Link>
+            <React.Fragment key={index}>
+              <Link key={index} to={`/hashtags/${word}`}>
+                {word}&nbsp;
+              </Link>
+            </React.Fragment>
           ) : (
-            <span key={index}>{word}&nbsp;</span>
+            <React.Fragment key={index}>{word}&nbsp;</React.Fragment>
           )
         )}
       </CommentCaption>
+      {isMine ? <DeleteButton onClick={onDeleteClick}>❌</DeleteButton> : null}
     </CommentContainer>
   );
 }
