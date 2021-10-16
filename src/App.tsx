@@ -8,6 +8,7 @@ import routes from "./routes";
 import Home from "./screens/Home";
 import Login from "./screens/Login";
 import NotFound from "./screens/NotFound";
+import Profile from "./screens/Profile";
 import SignUp from "./screens/SignUp";
 import { darkTheme, GlobalStyles, lightTheme } from "./styles";
 
@@ -22,7 +23,7 @@ function App() {
           <GlobalStyles />
           <Router>
             <Switch>
-              <Route path="/" exact>
+              <Route path={routes.home} exact>
                 {isLoggedIn ? (
                   <Layout>
                     <Home />
@@ -32,10 +33,13 @@ function App() {
                 )}
               </Route>
               {!isLoggedIn ? (
-                <Route path={routes.signUp}>
+                <Route path={routes.signUp} exact>
                   <SignUp />
                 </Route>
               ) : null}
+              <Route path={routes.profile} exact>
+                <Profile />
+              </Route>
               <Route>
                 <NotFound />
               </Route>

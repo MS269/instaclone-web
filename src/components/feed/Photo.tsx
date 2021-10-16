@@ -8,6 +8,7 @@ import {
 import { faHeart as SolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import gql from "graphql-tag";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import {
   SeeFeedQuery_seeFeed_comments,
@@ -127,8 +128,12 @@ function Photo({
   return (
     <PhotoContainer key={id}>
       <PhotoHeader>
-        <Avatar url={user.avatar || ""} lg />
-        <Username>{user.username}</Username>
+        <Link to={`/users/${user.username}`}>
+          <Avatar url={user.avatar || ""} lg />
+        </Link>
+        <Link to={`/users/${user.username}`}>
+          <Username>{user.username}</Username>
+        </Link>
       </PhotoHeader>
       <PhotoFile src={file} alt={`${user.username}'s Photo'`} />
       <PhotoData>

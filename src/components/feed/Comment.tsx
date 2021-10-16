@@ -71,7 +71,9 @@ function Comment({ id, photoId, author, payload, isMine }: ICommentProps) {
 
   return (
     <CommentContainer>
-      <FatText>{author}</FatText>
+      <Link to={`users/${author}`}>
+        <FatText>{author}</FatText>
+      </Link>
       <CommentCaption>
         {payload.split(" ").map((word, index) =>
           /#[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\w]+/g.test(word) ? (

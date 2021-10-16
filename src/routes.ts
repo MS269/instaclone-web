@@ -5,6 +5,7 @@ interface IRoutes {
 const routes: IRoutes = {
   home: "/",
   signUp: "/signup",
+  profile: "/users/:username",
 };
 
 export default routes;
