@@ -38,7 +38,9 @@ function App() {
                 </Route>
               ) : null}
               <Route path={routes.profile} exact>
-                <Profile />
+                <Layout>
+                  <Profile />
+                </Layout>
               </Route>
               <Route>
                 <NotFound />

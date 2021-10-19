@@ -4,10 +4,12 @@ import { useEffect } from "react";
 import { useHistory } from "react-router";
 import { isLoggedInVar, logUserOut } from "../apollo";
 import { IState } from "../types";
+import { MeQuery } from "../__generated__/MeQuery";
 
 const ME_QUERY = gql`
   query MeQuery {
     me {
+      id
       username
       avatar
     }
@@ -17,7 +19,7 @@ const ME_QUERY = gql`
 function useUser() {
   const history = useHistory<IState>();
   const hasToken = useReactiveVar(isLoggedInVar);
-  const { data } = useQuery(ME_QUERY, { skip: !hasToken });
+  const { data } = useQuery<MeQuery>(ME_QUERY, { skip: !hasToken });
 
   useEffect(() => {
     if (data?.me === null) {
